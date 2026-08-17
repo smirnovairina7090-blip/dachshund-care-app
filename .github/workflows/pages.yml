@@ -3,10 +3,14 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - docs/LAST_PAGES_DEPLOY.txt
+  issues:
+    types: [opened]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -18,8 +22,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout current main
         uses: actions/checkout@v6
+        with:
+          ref: main
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -68,3 +74,28 @@ jobs:
           curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}" -o /tmp/index.html
           test -s /tmp/index.html
           echo "Published app is reachable: ${PAGE_URL}"
+
+  mark-success:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Record successful Pages deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs
+          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/LAST_PAGES_DEPLOY.txt
+          if git diff --cached --quiet; then
+            echo "Deploy marker is already current."
+          else
+            git commit -m "ci: record successful Pages deploy"
+            git push
+          fi
