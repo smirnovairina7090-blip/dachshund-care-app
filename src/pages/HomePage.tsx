@@ -21,7 +21,7 @@ export function HomePage({ name, day, wallet, onChangeDayType, onCompleteTask }:
     <main className="page home-page">
       <header className="topbar pixel-panel">
         <div className="pet-heading">
-          <PixelSprite name="dog-sitting" scale={0.85} />
+          <PixelSprite name="dog-sitting" scale={0.9} />
           <div>
             <p className="eyebrow">Сегодня вместе</p>
             <h1>{name}</h1>
@@ -29,8 +29,8 @@ export function HomePage({ name, day, wallet, onChangeDayType, onCompleteTask }:
         </div>
 
         <div className="wallet" aria-label="Игровые награды">
-          <span><PixelSprite name="currency-bone" scale={0.48} /> <b>{wallet.bones}</b></span>
-          <span><PixelSprite name="currency-coin" scale={0.48} /> <b>{wallet.coins}</b></span>
+          <span><PixelSprite name="currency-bone" scale={0.5} /> <b>{wallet.bones}</b></span>
+          <span><PixelSprite name="currency-coin" scale={0.5} /> <b>{wallet.coins}</b></span>
         </div>
       </header>
 
@@ -76,7 +76,7 @@ export function HomePage({ name, day, wallet, onChangeDayType, onCompleteTask }:
                 <strong>{task.title}</strong>
                 <small>{task.hint}</small>
               </span>
-              <span className="task-reward"><PixelSprite name="currency-bone" scale={0.38} /> +{task.rewardBones}</span>
+              <span className="task-reward"><PixelSprite name="currency-bone" scale={0.35} /> +{task.rewardBones}</span>
             </button>
           ))}
         </div>

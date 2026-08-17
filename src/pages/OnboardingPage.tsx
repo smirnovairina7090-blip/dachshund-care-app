@@ -17,12 +17,9 @@ export function OnboardingPage({ onCreate }: OnboardingPageProps) {
   return (
     <main className="onboarding-shell">
       <section className="onboarding-card pixel-panel">
-        <div className="onboarding-sparkle onboarding-sparkle-one" aria-hidden="true">✦</div>
-        <div className="onboarding-sparkle onboarding-sparkle-two" aria-hidden="true">✦</div>
-
         <div className="onboarding-character" aria-hidden="true">
-          <PixelSprite name="dog-sitting" scale={3} />
-          <PixelSprite name="effect-heart" scale={0.65} className="onboarding-heart" />
+          <PixelSprite name="dog-sitting" scale={2.75} />
+          <PixelSprite name="effect-heart" scale={0.72} className="onboarding-heart" />
         </div>
 
         <p className="eyebrow">Добро пожаловать в мир такс</p>

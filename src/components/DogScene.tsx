@@ -17,7 +17,7 @@ export function DogScene({ name, progress }: DogSceneProps) {
   const mood = progress >= 85
     ? 'довольна сегодняшним днём'
     : progress >= 55
-      ? 'любопытно смотрит, что будет дальше'
+      ? 'интересуется, что будет дальше'
       : progress >= 25
         ? 'спокойно проводит день рядом'
         : 'кажется, пора придумать первое дело'
@@ -25,14 +25,25 @@ export function DogScene({ name, progress }: DogSceneProps) {
   return (
     <section className="dog-scene" aria-label={`Комната питомца ${name}`}>
       <div className="scene-wall-pattern" aria-hidden="true" />
-      <div className="room-prop room-window" aria-hidden="true"><PixelSprite name="room-window" scale={1.35} /></div>
-      <div className="room-prop room-sofa" aria-hidden="true"><PixelSprite name="room-sofa" scale={1.2} /></div>
-      <div className="room-prop room-plant" aria-hidden="true"><PixelSprite name="room-plant-table" scale={1.05} /></div>
-      <div className="room-prop room-bed" aria-hidden="true"><PixelSprite name="room-dog-bed" scale={1.05} /></div>
+      <div className="scene-floor-lines" aria-hidden="true" />
+      <div className="scene-rug" aria-hidden="true" />
+
+      <div className="room-prop room-window" aria-hidden="true">
+        <PixelSprite name="room-window" scale={1.25} />
+      </div>
+      <div className="room-prop room-sofa" aria-hidden="true">
+        <PixelSprite name="room-sofa" scale={1.25} />
+      </div>
+      <div className="room-prop room-plant" aria-hidden="true">
+        <PixelSprite name="room-plant-table" scale={1} />
+      </div>
+      <div className="room-prop room-bed" aria-hidden="true">
+        <PixelSprite name="room-dog-bed" scale={1} />
+      </div>
 
       <div className="scene-dog-wrap" aria-hidden="true">
-        <PixelSprite name={dogState} scale={3} />
-        <PixelSprite name="effect-heart" scale={0.48} className="scene-heart" />
+        <PixelSprite name={dogState} scale={2.75} className="scene-dog-sprite" />
+        <PixelSprite name="effect-heart" scale={0.75} className="scene-heart" />
       </div>
 
       <div className="scene-bubble pixel-panel">

@@ -27,7 +27,7 @@ export function QuickActions({ tasks, onComplete }: QuickActionsProps) {
     <div className="quick-actions" aria-label="Быстрые действия">
       {[...nextByKind.values()].slice(0, 6).map((task) => (
         <button className="action-button pixel-button" key={task.id} onClick={() => onComplete(task.id)} type="button">
-          <PixelSprite name={icons[task.kind]} className="action-pixel-icon" />
+          <PixelSprite name={icons[task.kind]} scale={1} className="action-pixel-icon" />
           <span>{task.title.replace('Утренняя ', '').replace('Вечерняя ', '')}</span>
           <small><PixelSprite name="currency-bone" scale={0.34} /> +{task.rewardBones}</small>
         </button>

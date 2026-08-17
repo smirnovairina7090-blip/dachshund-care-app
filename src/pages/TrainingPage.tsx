@@ -1,3 +1,5 @@
+import { PixelSprite } from '../components/PixelSprite'
+
 const commands = [
   { name: 'Сидеть', level: 'Уверенно дома', progress: 80 },
   { name: 'Ждать', level: 'Закрепляем', progress: 55 },
@@ -7,12 +9,17 @@ const commands = [
 export function TrainingPage() {
   return (
     <main className="page simple-page">
-      <p className="eyebrow">Навыки без спешки</p>
-      <h1>Дрессировка</h1>
-      <p className="page-lead">В первом рабочем срезе уже есть структура библиотеки команд. Следующим шагом подключим реальные тренировочные сессии и заметки.</p>
+      <div className="page-heading-with-icon">
+        <PixelSprite name="nav-training" scale={0.9} />
+        <div>
+          <p className="eyebrow">Навыки без спешки</p>
+          <h1>Дрессировка</h1>
+        </div>
+      </div>
+      <p className="page-lead">Пока здесь живёт базовая библиотека команд. Визуал уже приведён к общей пиксельной системе, а тренировочную логику подключим после утверждения интерфейса.</p>
       <div className="command-list">
         {commands.map((command) => (
-          <article className="command-card" key={command.name}>
+          <article className="command-card pixel-panel" key={command.name}>
             <div><strong>{command.name}</strong><span>{command.level}</span></div>
             <div className="mini-progress"><span style={{ width: `${command.progress}%` }} /></div>
             <b>{command.progress}%</b>
