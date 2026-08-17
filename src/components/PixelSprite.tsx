@@ -1,53 +1,105 @@
 import type { CSSProperties } from 'react'
 
+type SpriteDefinition = {
+  image: 'dog.webp' | 'care.webp' | 'navigation.webp' | 'currency-effects.webp' | 'room.webp'
+  atlasWidth: number
+  atlasHeight: number
+  x: number
+  y: number
+  w: number
+  h: number
+  displayScale: number
+}
+
+const dog = (x: number, y: number): SpriteDefinition => ({
+  image: 'dog.webp', atlasWidth: 256, atlasHeight: 168, x, y, w: 64, h: 56, displayScale: 1,
+})
+
+const care = (x: number, y: number): SpriteDefinition => ({
+  image: 'care.webp', atlasWidth: 200, atlasHeight: 108, x, y, w: 40, h: 36, displayScale: 1.4,
+})
+
+const nav = (x: number): SpriteDefinition => ({
+  image: 'navigation.webp', atlasWidth: 160, atlasHeight: 32, x, y: 0, w: 32, h: 32, displayScale: 2,
+})
+
+const effect = (x: number): SpriteDefinition => ({
+  image: 'currency-effects.webp', atlasWidth: 200, atlasHeight: 36, x, y: 0, w: 40, h: 36, displayScale: 1.4,
+})
+
+const room = (x: number, y: number): SpriteDefinition => ({
+  image: 'room.webp', atlasWidth: 384, atlasHeight: 144, x, y, w: 96, h: 72, displayScale: 1.2,
+})
+
+const dogIdle = dog(0, 0)
+const dogPlaying = dog(192, 56)
+const heart = effect(80)
+const careBed = care(0, 36)
+const careCamera = care(40, 36)
+const careTraining = care(0, 72)
+const careGrooming = care(40, 72)
+const roomPlant = room(0, 72)
+const roomBed = room(96, 72)
+
 const sprites = {
-  'dog-idle': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 0, y: 0, w: 64, h: 64 },
-  'dog-sitting': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 64, y: 0, w: 64, h: 64 },
-  'dog-standing': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 128, y: 0, w: 64, h: 64 },
-  'dog-happy': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 192, y: 0, w: 64, h: 64 },
-  'dog-playing': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 0, y: 64, w: 64, h: 64 },
-  'dog-bringing': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 64, y: 64, w: 64, h: 64 },
-  'dog-waiting-walk': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 128, y: 64, w: 64, h: 64 },
-  'dog-eating': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 192, y: 64, w: 64, h: 64 },
-  'dog-drinking': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 0, y: 128, w: 64, h: 64 },
-  'dog-sleeping': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 64, y: 128, w: 64, h: 64 },
-  'dog-sad': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 128, y: 128, w: 64, h: 64 },
-  'dog-curious': { image: 'dog-states.png', atlasWidth: 256, atlasHeight: 192, x: 192, y: 128, w: 64, h: 64 },
+  'dog-idle': dogIdle,
+  'dog-sitting': dog(64, 0),
+  'dog-standing': dogIdle,
+  'dog-happy': dog(128, 0),
+  'dog-curious': dog(192, 0),
+  'dog-waiting-walk': dog(0, 56),
+  'dog-eating': dog(64, 56),
+  'dog-drinking': dog(128, 56),
+  'dog-playing': dogPlaying,
+  'dog-bringing': dogPlaying,
+  'dog-sleeping': dog(0, 112),
+  'dog-brushed': dog(64, 112),
+  'dog-sad': dog(128, 112),
 
-  'care-food': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 0, y: 0, w: 56, h: 56 },
-  'care-water': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 56, y: 0, w: 56, h: 56 },
-  'care-leash': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 112, y: 0, w: 56, h: 56 },
-  'care-play': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 168, y: 0, w: 56, h: 56 },
-  'care-training': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 224, y: 0, w: 56, h: 56 },
-  'care-brush': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 280, y: 0, w: 56, h: 56 },
-  'care-sleep': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 0, y: 56, w: 56, h: 56 },
-  'care-pet': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 56, y: 56, w: 56, h: 56 },
-  'care-photo': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 112, y: 56, w: 56, h: 56 },
-  'care-vet': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 168, y: 56, w: 56, h: 56 },
-  'care-clean': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 224, y: 56, w: 56, h: 56 },
-  'care-learn': { image: 'care-icons.png', atlasWidth: 336, atlasHeight: 112, x: 280, y: 56, w: 56, h: 56 },
+  'care-food': care(0, 0),
+  'care-water': care(40, 0),
+  'care-leash': care(80, 0),
+  'care-play': care(120, 0),
+  'care-brush': care(160, 0),
+  'care-bed': careBed,
+  'care-sleep': careBed,
+  'care-camera': careCamera,
+  'care-photo': careCamera,
+  'care-vet': care(80, 36),
+  'care-diary': care(120, 36),
+  'care-trophy': care(160, 36),
+  'care-training': careTraining,
+  'care-learn': careTraining,
+  'care-grooming': careGrooming,
+  'care-clean': careGrooming,
+  'care-treat': care(80, 72),
+  'care-shower': care(120, 72),
+  'care-nails': care(160, 72),
+  'care-pet': heart,
 
-  'nav-home': { image: 'navigation.png', atlasWidth: 320, atlasHeight: 64, x: 0, y: 0, w: 64, h: 64 },
-  'nav-training': { image: 'navigation.png', atlasWidth: 320, atlasHeight: 64, x: 64, y: 0, w: 64, h: 64 },
-  'nav-adventures': { image: 'navigation.png', atlasWidth: 320, atlasHeight: 64, x: 128, y: 0, w: 64, h: 64 },
-  'nav-history': { image: 'navigation.png', atlasWidth: 320, atlasHeight: 64, x: 192, y: 0, w: 64, h: 64 },
-  'nav-more': { image: 'navigation.png', atlasWidth: 320, atlasHeight: 64, x: 256, y: 0, w: 64, h: 64 },
+  'nav-home': nav(0),
+  'nav-training': nav(32),
+  'nav-adventures': nav(64),
+  'nav-history': nav(96),
+  'nav-more': nav(128),
 
-  'currency-bone': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 0, y: 0, w: 56, h: 56 },
-  'currency-coin': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 56, y: 0, w: 56, h: 56 },
-  'effect-heart': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 112, y: 0, w: 56, h: 56 },
-  'effect-tail-1': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 168, y: 0, w: 56, h: 56 },
-  'effect-tail-2': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 224, y: 0, w: 56, h: 56 },
-  'effect-tail-3': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 0, y: 56, w: 56, h: 56 },
-  'effect-tail-4': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 56, y: 56, w: 56, h: 56 },
-  'effect-tail-5': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 112, y: 56, w: 56, h: 56 },
-  'effect-tail-6': { image: 'currency-effects.png', atlasWidth: 280, atlasHeight: 112, x: 168, y: 56, w: 56, h: 56 },
+  'currency-bone': effect(0),
+  'currency-coin': effect(40),
+  'currency-heart': heart,
+  'effect-heart': heart,
+  'effect-speech': effect(120),
+  'effect-sparkle': effect(160),
 
-  'room-sofa': { image: 'room-props.png', atlasWidth: 224, atlasHeight: 224, x: 0, y: 0, w: 112, h: 112 },
-  'room-plant-table': { image: 'room-props.png', atlasWidth: 224, atlasHeight: 224, x: 112, y: 0, w: 112, h: 112 },
-  'room-window': { image: 'room-props.png', atlasWidth: 224, atlasHeight: 224, x: 0, y: 112, w: 112, h: 112 },
-  'room-dog-bed': { image: 'room-props.png', atlasWidth: 224, atlasHeight: 224, x: 112, y: 112, w: 112, h: 112 },
-} as const
+  'room-window': room(0, 0),
+  'room-sofa': room(96, 0),
+  'room-side-table': room(192, 0),
+  'room-lamp': room(288, 0),
+  'room-plant': roomPlant,
+  'room-plant-table': roomPlant,
+  'room-bed': roomBed,
+  'room-dog-bed': roomBed,
+  'room-rug': room(192, 72),
+} satisfies Record<string, SpriteDefinition>
 
 export type PixelSpriteName = keyof typeof sprites
 
@@ -60,14 +112,15 @@ interface PixelSpriteProps {
 
 export function PixelSprite({ name, scale = 1, className, label }: PixelSpriteProps) {
   const sprite = sprites[name]
+  const factor = sprite.displayScale * scale
   const style: CSSProperties = {
     display: 'inline-block',
-    width: sprite.w * scale,
-    height: sprite.h * scale,
-    backgroundImage: `url(${import.meta.env.BASE_URL}assets/pixel/production/v1/${sprite.image})`,
+    width: sprite.w * factor,
+    height: sprite.h * factor,
+    backgroundImage: `url(${import.meta.env.BASE_URL}assets/pixel/production/v2/${sprite.image})`,
     backgroundRepeat: 'no-repeat',
-    backgroundSize: `${sprite.atlasWidth * scale}px ${sprite.atlasHeight * scale}px`,
-    backgroundPosition: `${-sprite.x * scale}px ${-sprite.y * scale}px`,
+    backgroundSize: `${sprite.atlasWidth * factor}px ${sprite.atlasHeight * factor}px`,
+    backgroundPosition: `${-sprite.x * factor}px ${-sprite.y * factor}px`,
     imageRendering: 'pixelated',
     flex: '0 0 auto',
   }
