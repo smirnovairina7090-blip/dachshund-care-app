@@ -1,14 +1,15 @@
 import type { DayTask, TaskKind } from '../domain/types'
+import { PixelSprite, type PixelSpriteName } from './PixelSprite'
 
-const icons: Record<TaskKind, string> = {
-  walk: '🦮',
-  feed: '🍲',
-  water: '💧',
-  play: '🎾',
-  train: '🧠',
-  care: '🪮',
-  mood: '💗',
-  photo: '📷',
+const icons: Record<TaskKind, PixelSpriteName> = {
+  walk: 'care-leash',
+  feed: 'care-food',
+  water: 'care-water',
+  play: 'care-play',
+  train: 'care-training',
+  care: 'care-brush',
+  mood: 'care-pet',
+  photo: 'care-photo',
 }
 
 interface QuickActionsProps {
@@ -25,10 +26,10 @@ export function QuickActions({ tasks, onComplete }: QuickActionsProps) {
   return (
     <div className="quick-actions" aria-label="Быстрые действия">
       {[...nextByKind.values()].slice(0, 6).map((task) => (
-        <button className="action-button" key={task.id} onClick={() => onComplete(task.id)} type="button">
-          <span className="action-icon" aria-hidden="true">{icons[task.kind]}</span>
+        <button className="action-button pixel-button" key={task.id} onClick={() => onComplete(task.id)} type="button">
+          <PixelSprite name={icons[task.kind]} className="action-pixel-icon" />
           <span>{task.title.replace('Утренняя ', '').replace('Вечерняя ', '')}</span>
-          <small>+{task.rewardBones} 🦴</small>
+          <small><PixelSprite name="currency-bone" scale={0.34} /> +{task.rewardBones}</small>
         </button>
       ))}
     </div>
