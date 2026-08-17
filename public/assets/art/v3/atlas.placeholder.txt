@@ -1,0 +1,1 @@
+This placeholder prevents empty-directory issues; the real binary atlas is committed in the same folder.
