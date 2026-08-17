@@ -24,17 +24,38 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
+
+      - name: Restore cinematic v3 art
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/assets/art/v3
+          base64 -d scripts/v3-atlas.b64 > public/assets/art/v3/atlas.avif
+          test -s public/assets/art/v3/atlas.avif
+          echo "Restored v3 atlas: $(wc -c < public/assets/art/v3/atlas.avif) bytes"
+
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
+
       - name: Install dependencies
         run: npm install
+
       - name: Build production app
         run: npm run build
+
+      - name: Verify production art is in dist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/assets/art/v3/atlas.avif
+          echo "Pages artifact contains cinematic v3 art: $(wc -c < dist/assets/art/v3/atlas.avif) bytes"
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
