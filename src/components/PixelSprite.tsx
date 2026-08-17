@@ -1,3 +1,5 @@
+import atlasBase64 from '../../scripts/v3-atlas.b64?raw'
+
 type AssetDefinition = {
   x: number
   y: number
@@ -9,6 +11,7 @@ type AssetDefinition = {
 
 const atlasWidth = 1000
 const atlasHeight = 496
+const atlasSrc = `data:image/avif;base64,${atlasBase64.trim()}`
 
 const dog = (index: number): AssetDefinition => ({
   x: index * 200,
@@ -145,33 +148,25 @@ export function PixelSprite({ name, scale = 1, className, label }: PixelSpritePr
   const sprite = sprites[name]
   const width = sprite.displayWidth * scale
   const height = sprite.displayHeight * scale
-  const href = `${import.meta.env.BASE_URL}assets/art/v3/atlas.avif`
+  const scaleX = width / sprite.width
+  const scaleY = height / sprite.height
 
   return (
     <span
       className={className ? `cinematic-asset ${className}` : 'cinematic-asset'}
-      style={{ width, height }}
+      style={{
+        width,
+        height,
+        display: 'inline-block',
+        flex: '0 0 auto',
+        backgroundImage: `url("${atlasSrc}")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: `${atlasWidth * scaleX}px ${atlasHeight * scaleY}px`,
+        backgroundPosition: `${-sprite.x * scaleX}px ${-sprite.y * scaleY}px`,
+      }}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-    >
-      <svg
-        viewBox={`0 0 ${sprite.width} ${sprite.height}`}
-        width="100%"
-        height="100%"
-        preserveAspectRatio="xMidYMid meet"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <image
-          href={href}
-          x={-sprite.x}
-          y={-sprite.y}
-          width={atlasWidth}
-          height={atlasHeight}
-          preserveAspectRatio="none"
-        />
-      </svg>
-    </span>
+    />
   )
 }
