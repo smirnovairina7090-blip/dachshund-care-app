@@ -1,0 +1,531 @@
+{
+  "version": 2,
+  "format": "webp",
+  "quality": "production-q90",
+  "atlases": {
+    "dog": {
+      "file": "dog.webp",
+      "width": 256,
+      "height": 168,
+      "cellWidth": 64,
+      "cellHeight": 56,
+      "columns": 4,
+      "rows": 3
+    },
+    "care": {
+      "file": "care.webp",
+      "width": 200,
+      "height": 108,
+      "cellWidth": 40,
+      "cellHeight": 36,
+      "columns": 5,
+      "rows": 3
+    },
+    "navigation": {
+      "file": "navigation.webp",
+      "width": 160,
+      "height": 32,
+      "cellWidth": 32,
+      "cellHeight": 32,
+      "columns": 5,
+      "rows": 1
+    },
+    "currency-effects": {
+      "file": "currency-effects.webp",
+      "width": 200,
+      "height": 36,
+      "cellWidth": 40,
+      "cellHeight": 36,
+      "columns": 5,
+      "rows": 1
+    },
+    "room": {
+      "file": "room.webp",
+      "width": 384,
+      "height": 144,
+      "cellWidth": 96,
+      "cellHeight": 72,
+      "columns": 4,
+      "rows": 2
+    }
+  },
+  "sprites": {
+    "dog-idle": {
+      "atlas": "dog.webp",
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-sitting": {
+      "atlas": "dog.webp",
+      "x": 64,
+      "y": 0,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-happy": {
+      "atlas": "dog.webp",
+      "x": 128,
+      "y": 0,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-curious": {
+      "atlas": "dog.webp",
+      "x": 192,
+      "y": 0,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-waiting-walk": {
+      "atlas": "dog.webp",
+      "x": 0,
+      "y": 56,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-eating": {
+      "atlas": "dog.webp",
+      "x": 64,
+      "y": 56,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-drinking": {
+      "atlas": "dog.webp",
+      "x": 128,
+      "y": 56,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-playing": {
+      "atlas": "dog.webp",
+      "x": 192,
+      "y": 56,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-sleeping": {
+      "atlas": "dog.webp",
+      "x": 0,
+      "y": 112,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-brushed": {
+      "atlas": "dog.webp",
+      "x": 64,
+      "y": 112,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-sad": {
+      "atlas": "dog.webp",
+      "x": 128,
+      "y": 112,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "care-food": {
+      "atlas": "care.webp",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-water": {
+      "atlas": "care.webp",
+      "x": 40,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-leash": {
+      "atlas": "care.webp",
+      "x": 80,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-play": {
+      "atlas": "care.webp",
+      "x": 120,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-brush": {
+      "atlas": "care.webp",
+      "x": 160,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-bed": {
+      "atlas": "care.webp",
+      "x": 0,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-camera": {
+      "atlas": "care.webp",
+      "x": 40,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-vet": {
+      "atlas": "care.webp",
+      "x": 80,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-diary": {
+      "atlas": "care.webp",
+      "x": 120,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-trophy": {
+      "atlas": "care.webp",
+      "x": 160,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-training": {
+      "atlas": "care.webp",
+      "x": 0,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-grooming": {
+      "atlas": "care.webp",
+      "x": 40,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-treat": {
+      "atlas": "care.webp",
+      "x": 80,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-shower": {
+      "atlas": "care.webp",
+      "x": 120,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-nails": {
+      "atlas": "care.webp",
+      "x": 160,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "nav-home": {
+      "atlas": "navigation.webp",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "atlasWidth": 160,
+      "atlasHeight": 32
+    },
+    "nav-training": {
+      "atlas": "navigation.webp",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "atlasWidth": 160,
+      "atlasHeight": 32
+    },
+    "nav-adventures": {
+      "atlas": "navigation.webp",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "atlasWidth": 160,
+      "atlasHeight": 32
+    },
+    "nav-history": {
+      "atlas": "navigation.webp",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "atlasWidth": 160,
+      "atlasHeight": 32
+    },
+    "nav-more": {
+      "atlas": "navigation.webp",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "atlasWidth": 160,
+      "atlasHeight": 32
+    },
+    "currency-bone": {
+      "atlas": "currency-effects.webp",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "currency-coin": {
+      "atlas": "currency-effects.webp",
+      "x": 40,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "currency-heart": {
+      "atlas": "currency-effects.webp",
+      "x": 80,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "effect-speech": {
+      "atlas": "currency-effects.webp",
+      "x": 120,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "effect-sparkle": {
+      "atlas": "currency-effects.webp",
+      "x": 160,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "room-window": {
+      "atlas": "room.webp",
+      "x": 0,
+      "y": 0,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-sofa": {
+      "atlas": "room.webp",
+      "x": 96,
+      "y": 0,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-side-table": {
+      "atlas": "room.webp",
+      "x": 192,
+      "y": 0,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-lamp": {
+      "atlas": "room.webp",
+      "x": 288,
+      "y": 0,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-plant": {
+      "atlas": "room.webp",
+      "x": 0,
+      "y": 72,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-bed": {
+      "atlas": "room.webp",
+      "x": 96,
+      "y": 72,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-rug": {
+      "atlas": "room.webp",
+      "x": 192,
+      "y": 72,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "effect-heart": {
+      "atlas": "currency-effects.webp",
+      "x": 80,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "care-pet": {
+      "atlas": "currency-effects.webp",
+      "x": 80,
+      "y": 0,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 36
+    },
+    "care-photo": {
+      "atlas": "care.webp",
+      "x": 40,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-sleep": {
+      "atlas": "care.webp",
+      "x": 0,
+      "y": 36,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-clean": {
+      "atlas": "care.webp",
+      "x": 40,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "care-learn": {
+      "atlas": "care.webp",
+      "x": 0,
+      "y": 72,
+      "w": 40,
+      "h": 36,
+      "atlasWidth": 200,
+      "atlasHeight": 108
+    },
+    "room-plant-table": {
+      "atlas": "room.webp",
+      "x": 0,
+      "y": 72,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "room-dog-bed": {
+      "atlas": "room.webp",
+      "x": 96,
+      "y": 72,
+      "w": 96,
+      "h": 72,
+      "atlasWidth": 384,
+      "atlasHeight": 144
+    },
+    "dog-standing": {
+      "atlas": "dog.webp",
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    },
+    "dog-bringing": {
+      "atlas": "dog.webp",
+      "x": 192,
+      "y": 56,
+      "w": 64,
+      "h": 56,
+      "atlasWidth": 256,
+      "atlasHeight": 168
+    }
+  }
+}
