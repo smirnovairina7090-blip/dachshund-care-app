@@ -71,3 +71,15 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Smoke-test published app and art
+        shell: bash
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}" -o /tmp/index.html
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v3/atlas.avif" -o /tmp/atlas.avif
+          test -s /tmp/index.html
+          test -s /tmp/atlas.avif
+          echo "Published v3 atlas: $(wc -c < /tmp/atlas.avif) bytes"
