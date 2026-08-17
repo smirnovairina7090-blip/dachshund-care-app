@@ -11,7 +11,7 @@ type AssetDefinition = {
 
 const atlasWidth = 1000
 const atlasHeight = 496
-const atlasSrc = `data:image/avif;base64,${atlasBase64.trim()}`
+const atlasSrc = `data:image/avif;base64,${atlasBase64.replace(/\s+/g, '')}`
 
 const dog = (index: number): AssetDefinition => ({
   x: index * 200,
