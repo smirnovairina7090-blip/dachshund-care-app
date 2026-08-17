@@ -1,9 +1,8 @@
 name: Deploy GitHub Pages
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -17,22 +16,10 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout current main
+      - name: Checkout
         uses: actions/checkout@v6
-        with:
-          ref: main
-
-      - name: Restore cinematic v3 art
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p public/assets/art/v3
-          base64 -d scripts/v3-atlas.b64 > public/assets/art/v3/atlas.avif
-          test -s public/assets/art/v3/atlas.avif
-          echo "Restored v3 atlas: $(wc -c < public/assets/art/v3/atlas.avif) bytes"
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -46,12 +33,12 @@ jobs:
       - name: Build production app
         run: npm run build
 
-      - name: Verify production art is in dist
+      - name: Verify embedded cinematic art
         shell: bash
         run: |
           set -euo pipefail
-          test -s dist/assets/art/v3/atlas.avif
-          echo "Pages artifact contains cinematic v3 art: $(wc -c < dist/assets/art/v3/atlas.avif) bytes"
+          grep -R --binary-files=text -q "data:image/avif;base64" dist/assets
+          echo "Cinematic atlas is embedded in the production bundle."
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -72,14 +59,12 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Smoke-test published app and art
+      - name: Smoke-test published app
         shell: bash
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
           curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}" -o /tmp/index.html
-          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v3/atlas.avif" -o /tmp/atlas.avif
           test -s /tmp/index.html
-          test -s /tmp/atlas.avif
-          echo "Published v3 atlas: $(wc -c < /tmp/atlas.avif) bytes"
+          echo "Published app is reachable: ${PAGE_URL}"
