@@ -1,0 +1,130 @@
+name: Install v2 pixel assets
+
+on:
+  push:
+    paths:
+      - '.asset-staging/v2/**'
+      - '.github/workflows/install-v2-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: install-v2-pixel-assets
+  cancel-in-progress: true
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Decode generated v2 atlases
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import json
+
+          staging = Path('.asset-staging/v2')
+          out = Path('public/assets/pixel/production/v2')
+          out.mkdir(parents=True, exist_ok=True)
+
+          names = ['dog', 'care', 'navigation', 'currency-effects', 'room']
+          for name in names:
+              chunks = sorted(staging.glob(f'{name}.*.b64'))
+              if not chunks:
+                  raise SystemExit(f'Missing staged chunks for {name}')
+              encoded = ''.join(chunk.read_text().strip() for chunk in chunks)
+              (out / f'{name}.webp').write_bytes(base64.b64decode(encoded))
+
+          manifest = {
+            'version': 2,
+            'format': 'webp',
+            'quality': 'production-q90',
+            'atlases': {
+              'dog': {'file': 'dog.webp', 'width': 256, 'height': 168, 'cellWidth': 64, 'cellHeight': 56, 'columns': 4, 'rows': 3},
+              'care': {'file': 'care.webp', 'width': 200, 'height': 108, 'cellWidth': 40, 'cellHeight': 36, 'columns': 5, 'rows': 3},
+              'navigation': {'file': 'navigation.webp', 'width': 160, 'height': 32, 'cellWidth': 32, 'cellHeight': 32, 'columns': 5, 'rows': 1},
+              'currency-effects': {'file': 'currency-effects.webp', 'width': 200, 'height': 36, 'cellWidth': 40, 'cellHeight': 36, 'columns': 5, 'rows': 1},
+              'room': {'file': 'room.webp', 'width': 384, 'height': 144, 'cellWidth': 96, 'cellHeight': 72, 'columns': 4, 'rows': 2},
+            },
+            'sprites': {}
+          }
+
+          def add_grid(keys, atlas, cols, cw, ch):
+              aw = manifest['atlases'][atlas]['width']
+              ah = manifest['atlases'][atlas]['height']
+              for index, key in enumerate(keys):
+                  row, col = divmod(index, cols)
+                  manifest['sprites'][key] = {
+                    'atlas': manifest['atlases'][atlas]['file'],
+                    'x': col * cw, 'y': row * ch, 'w': cw, 'h': ch,
+                    'atlasWidth': aw, 'atlasHeight': ah,
+                  }
+
+          add_grid([
+            'dog-idle', 'dog-sitting', 'dog-happy', 'dog-curious',
+            'dog-waiting-walk', 'dog-eating', 'dog-drinking', 'dog-playing',
+            'dog-sleeping', 'dog-brushed', 'dog-sad'
+          ], 'dog', 4, 64, 56)
+
+          add_grid([
+            'care-food', 'care-water', 'care-leash', 'care-play', 'care-brush',
+            'care-bed', 'care-camera', 'care-vet', 'care-diary', 'care-trophy',
+            'care-training', 'care-grooming', 'care-treat', 'care-shower', 'care-nails'
+          ], 'care', 5, 40, 36)
+
+          add_grid(['nav-home', 'nav-training', 'nav-adventures', 'nav-history', 'nav-more'], 'navigation', 5, 32, 32)
+          add_grid(['currency-bone', 'currency-coin', 'currency-heart', 'effect-speech', 'effect-sparkle'], 'currency-effects', 5, 40, 36)
+          add_grid(['room-window', 'room-sofa', 'room-side-table', 'room-lamp', 'room-plant', 'room-bed', 'room-rug'], 'room', 4, 96, 72)
+
+          aliases = {
+            'effect-heart': 'currency-heart',
+            'care-pet': 'currency-heart',
+            'care-photo': 'care-camera',
+            'care-sleep': 'care-bed',
+            'care-clean': 'care-grooming',
+            'care-learn': 'care-training',
+            'room-plant-table': 'room-plant',
+            'room-dog-bed': 'room-bed',
+            'dog-standing': 'dog-idle',
+            'dog-bringing': 'dog-playing',
+          }
+          for alias, target in aliases.items():
+              manifest['sprites'][alias] = dict(manifest['sprites'][target])
+
+          (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+          (out / 'README.md').write_text('''# Pixel assets v2\n\nProduction asset pack generated from the approved high-detail pixel-art sheets.\n\n- `dog.webp` - dachshund states and reactions\n- `care.webp` - care and action icons\n- `navigation.webp` - app navigation icons\n- `currency-effects.webp` - bone, coin, heart and effects\n- `room.webp` - room furniture and decor\n- `manifest.json` - exact atlas coordinates and compatibility aliases\n\nThe app renders these atlases with `image-rendering: pixelated` and preserves one common visual language across phone and desktop layouts.\n''')
+
+          docs = Path('docs/visual/generated/v2')
+          docs.mkdir(parents=True, exist_ok=True)
+          (docs / 'README.md').write_text('''# Generated pixel asset pack v2\n\nThis is the approved second-generation visual system used by the app. The production atlases below are extracted from the generated high-detail source sheets rather than recreated with CSS primitives.\n\n## Character states\n\n![Dog states](../../../../public/assets/pixel/production/v2/dog.webp)\n\n## Care and action icons\n\n![Care icons](../../../../public/assets/pixel/production/v2/care.webp)\n\n## Navigation\n\n![Navigation](../../../../public/assets/pixel/production/v2/navigation.webp)\n\n## Currency and effects\n\n![Currency and effects](../../../../public/assets/pixel/production/v2/currency-effects.webp)\n\n## Room props\n\n![Room props](../../../../public/assets/pixel/production/v2/room.webp)\n''')
+
+          # Staging contains base64 transport chunks only. It is intentionally removed after decoding.
+          for file in staging.glob('*'):
+              file.unlink()
+          try:
+              staging.rmdir()
+              staging.parent.rmdir()
+          except OSError:
+              pass
+          PY
+
+      - name: Commit decoded v2 assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/pixel/production/v2 docs/visual/generated/v2 .asset-staging || true
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "design: install generated pixel asset pack v2"
+          git push
