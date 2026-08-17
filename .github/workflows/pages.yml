@@ -27,6 +27,25 @@ jobs:
         with:
           ref: main
 
+      - name: Restore source art
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d scripts/v3-atlas.b64 > /tmp/atlas.avif
+          test -s /tmp/atlas.avif
+
+      - name: Convert art to universal PNG
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y libavif-bin
+          mkdir -p public/assets/art/v3
+          avifdec /tmp/atlas.avif public/assets/art/v3/atlas.png
+          test -s public/assets/art/v3/atlas.png
+          file public/assets/art/v3/atlas.png | grep -q 'PNG image data'
+          echo "Generated browser-safe PNG atlas: $(wc -c < public/assets/art/v3/atlas.png) bytes"
+
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
@@ -39,12 +58,14 @@ jobs:
       - name: Build production app
         run: npm run build
 
-      - name: Verify embedded cinematic art
+      - name: Verify production art
         shell: bash
         run: |
           set -euo pipefail
-          grep -R --binary-files=text -q "data:image/avif;base64" dist/assets
-          echo "Cinematic atlas is embedded in the production bundle."
+          test -s dist/assets/art/v3/atlas.png
+          file dist/assets/art/v3/atlas.png | grep -q 'PNG image data'
+          grep -R --binary-files=text -q 'atlas.png?v=20260818-0250' dist/assets
+          echo "Production bundle references and contains the PNG atlas."
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -65,15 +86,18 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Smoke-test published app
+      - name: Smoke-test published app and PNG art
         shell: bash
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
           curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}" -o /tmp/index.html
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v3/atlas.png?v=20260818-0250" -o /tmp/atlas.png
           test -s /tmp/index.html
-          echo "Published app is reachable: ${PAGE_URL}"
+          test -s /tmp/atlas.png
+          file /tmp/atlas.png | grep -q 'PNG image data'
+          echo "Published app and PNG atlas are reachable."
 
   mark-success:
     runs-on: ubuntu-latest
@@ -89,7 +113,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p docs
-          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
+          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\nPNG atlas smoke test: passed\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/LAST_PAGES_DEPLOY.txt
