@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   workflow_run:
-    workflows: ["pages build and deployment"]
+    workflows: ["CI"]
     types: [completed]
   workflow_dispatch:
 
@@ -20,7 +20,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout current main
         uses: actions/checkout@v6
         with:
           ref: main
@@ -31,7 +31,7 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm install
-      - name: Build
+      - name: Build production app
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
