@@ -3,9 +3,6 @@ name: Install v3 cinematic art
 on:
   push:
     branches: [main]
-    paths:
-      - scripts/v3-atlas.b64
-      - .github/workflows/install-v3-art.yml
   workflow_dispatch:
 
 permissions:
@@ -21,13 +18,18 @@ jobs:
           ref: main
 
       - name: Decode production art atlas
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p public/assets/art/v3
           base64 -d scripts/v3-atlas.b64 > public/assets/art/v3/atlas.avif
           test -s public/assets/art/v3/atlas.avif
+          echo "Decoded atlas: $(wc -c < public/assets/art/v3/atlas.avif) bytes"
 
-      - name: Commit production art
+      - name: Commit production art if needed
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/assets/art/v3/atlas.avif
