@@ -1,5 +1,3 @@
-import atlasBase64 from '../../scripts/v3-atlas.b64?raw'
-
 type AssetDefinition = {
   x: number
   y: number
@@ -11,69 +9,55 @@ type AssetDefinition = {
 
 const atlasWidth = 1000
 const atlasHeight = 496
-const atlasSrc = `data:image/avif;base64,${atlasBase64.replace(/\s+/g, '')}`
+const atlasSrc = `${import.meta.env.BASE_URL}assets/art/v3/atlas.png?v=20260818-0250`
 
-const dog = (index: number): AssetDefinition => ({
-  x: index * 200,
-  y: 0,
-  width: 200,
-  height: 180,
-  displayWidth: 64,
-  displayHeight: 58,
+const asset = (
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  displayWidth: number,
+): AssetDefinition => ({
+  x,
+  y,
+  width,
+  height,
+  displayWidth,
+  displayHeight: displayWidth * (height / width),
 })
 
-const action = (index: number): AssetDefinition => ({
-  x: index * 96,
-  y: 180,
-  width: 96,
-  height: 96,
-  displayWidth: 56,
-  displayHeight: 56,
-})
+// Character crops are taken from the real visible bounds of the generated art,
+// rather than from equal atlas cells. This prevents neighbouring dogs from leaking in.
+const dogIdle = asset(23, 21, 153, 154, 78)
+const dogHappy = asset(227, 5, 146, 170, 70)
+const dogCurious = asset(441, 6, 118, 168, 58)
+const dogPlaying = asset(609, 5, 182, 170, 86)
+const dogWaiting = asset(836, 5, 128, 170, 62)
 
-const ui = (index: number): AssetDefinition => ({
-  x: index * 80,
-  y: 276,
-  width: 80,
-  height: 80,
-  displayWidth: 56,
-  displayHeight: 56,
-})
+const feed = asset(5, 185, 86, 86, 56)
+const water = asset(101, 186, 86, 83, 56)
+const walk = asset(201, 204, 82, 64, 58)
+const play = asset(293, 186, 86, 83, 56)
+const train = asset(389, 188, 86, 80, 56)
+const groom = asset(485, 188, 86, 80, 56)
+const photo = asset(581, 190, 86, 75, 56)
 
-const room = (index: number): AssetDefinition => ({
-  x: index * 180,
-  y: 356,
-  width: 180,
-  height: 140,
-  displayWidth: 115,
-  displayHeight: 89,
-})
+// UI/nav icons keep their complete 80x80 generated cells so their soft 3D frames are intact.
+const bone = asset(0, 276, 80, 80, 42)
+const coin = asset(80, 276, 80, 80, 42)
+const heart = asset(160, 276, 80, 80, 42)
+const home = asset(240, 276, 80, 80, 42)
+const training = asset(320, 276, 80, 80, 42)
+const adventures = asset(400, 276, 80, 80, 42)
+const history = asset(480, 276, 80, 80, 42)
+const more = asset(560, 276, 80, 80, 42)
 
-const dogIdle = dog(0)
-const dogHappy = dog(1)
-const dogWaiting = dog(2)
-const dogCurious = dog(3)
-const dogSleeping = dog(4)
-const feed = action(0)
-const water = action(1)
-const walk = action(2)
-const play = action(3)
-const train = action(4)
-const groom = action(5)
-const photo = action(6)
-const bone = ui(0)
-const coin = ui(1)
-const heart = ui(2)
-const home = ui(3)
-const training = ui(4)
-const adventures = ui(5)
-const history = ui(6)
-const more = ui(7)
-const windowAsset = room(0)
-const sofa = room(1)
-const rug = room(2)
-const bed = room(3)
-const tableLamp = room(4)
+// Room crops deliberately start below the generated sheet headings.
+const windowAsset = asset(30, 386, 119, 110, 118)
+const sofa = asset(188, 386, 163, 110, 150)
+const rug = asset(365, 387, 170, 77, 150)
+const bed = asset(545, 369, 170, 113, 150)
+const tableLamp = asset(761, 361, 97, 130, 92)
 
 const sprites = {
   'dog-idle': dogIdle,
@@ -84,9 +68,9 @@ const sprites = {
   'dog-waiting-walk': dogWaiting,
   'dog-eating': dogIdle,
   'dog-drinking': dogIdle,
-  'dog-playing': dogHappy,
-  'dog-bringing': dogHappy,
-  'dog-sleeping': dogSleeping,
+  'dog-playing': dogPlaying,
+  'dog-bringing': dogPlaying,
+  'dog-sleeping': dogIdle,
   'dog-brushed': dogHappy,
   'dog-sad': dogWaiting,
 
@@ -148,8 +132,7 @@ export function PixelSprite({ name, scale = 1, className, label }: PixelSpritePr
   const sprite = sprites[name]
   const width = sprite.displayWidth * scale
   const height = sprite.displayHeight * scale
-  const scaleX = width / sprite.width
-  const scaleY = height / sprite.height
+  const renderScale = width / sprite.width
 
   return (
     <span
@@ -159,10 +142,10 @@ export function PixelSprite({ name, scale = 1, className, label }: PixelSpritePr
         height,
         display: 'inline-block',
         flex: '0 0 auto',
-        backgroundImage: `url("${atlasSrc}")`,
+        backgroundImage: `url(${atlasSrc})`,
         backgroundRepeat: 'no-repeat',
-        backgroundSize: `${atlasWidth * scaleX}px ${atlasHeight * scaleY}px`,
-        backgroundPosition: `${-sprite.x * scaleX}px ${-sprite.y * scaleY}px`,
+        backgroundSize: `${atlasWidth * renderScale}px ${atlasHeight * renderScale}px`,
+        backgroundPosition: `${-sprite.x * renderScale}px ${-sprite.y * renderScale}px`,
       }}
       role={label ? 'img' : undefined}
       aria-label={label}
