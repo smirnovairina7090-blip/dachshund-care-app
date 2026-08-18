@@ -1,3 +1,3 @@
 Pages deploy succeeded
-Source commit: 6eb0a22981cbea84a0b5e2b7e845002827e866ad
-Workflow run: 32081591393
+Art pipeline: v4 lossless PNG
+Verified externally: published JS references assets/art/v4/, dog-idle.png is reachable and contains visible pixels.
