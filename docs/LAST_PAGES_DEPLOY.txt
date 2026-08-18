@@ -1,4 +1,4 @@
 Pages deploy succeeded
-Source commit: 2e233e93dced7fed7e25117208142a48660d6abd
-Workflow run: 32114757147
-v2 direct WebP smoke test: passed
+Source commit: 26f47640fb2e2fdf11bf614625fcfc343a993514
+Workflow run: 32114898167
+v5 generated 3D art smoke test: passed
