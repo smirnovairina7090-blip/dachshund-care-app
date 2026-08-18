@@ -1,6 +1,5 @@
 import { DogScene } from '../components/DogScene'
 import { PixelSprite } from '../components/PixelSprite'
-import { QuickActions } from '../components/QuickActions'
 import type { DayRecord, DayType, Wallet } from '../domain/types'
 import { getCompletedCount, getProgress } from '../game/progress'
 
@@ -18,65 +17,63 @@ export function HomePage({ name, day, wallet, onChangeDayType, onCompleteTask }:
   const nextTask = day.tasks.find((task) => !task.completedAt)
 
   return (
-    <main className="page home-page">
-      <header className="topbar pixel-panel">
-        <div className="pet-heading">
-          <PixelSprite name="dog-sitting" scale={0.9} />
-          <div>
-            <p className="eyebrow">Сегодня вместе</p>
+    <main className="page home-page game-home-page">
+      <section className="game-stage-shell">
+        <header className="game-topbar">
+          <div className="game-title-block">
+            <p className="game-kicker">Сегодня вместе</p>
             <h1>{name}</h1>
           </div>
-        </div>
 
-        <div className="wallet" aria-label="Игровые награды">
-          <span><PixelSprite name="currency-bone" scale={0.5} /> <b>{wallet.bones}</b></span>
-          <span><PixelSprite name="currency-coin" scale={0.5} /> <b>{wallet.coins}</b></span>
-        </div>
-      </header>
-
-      <div className="day-switch pixel-panel" role="group" aria-label="Тип дня">
-        <button className={day.type === 'weekday' ? 'active' : ''} onClick={() => onChangeDayType('weekday')} type="button">Будни</button>
-        <button className={day.type === 'weekend' ? 'active' : ''} onClick={() => onChangeDayType('weekend')} type="button">Выходные</button>
-      </div>
-
-      <DogScene name={name} progress={progress} />
-
-      <section className="progress-card pixel-panel">
-        <div className="progress-heading">
-          <div>
-            <p className="eyebrow">Сегодня</p>
-            <strong>{completed} из {day.tasks.length} дел</strong>
+          <div className="wallet game-wallet" aria-label="Игровые награды">
+            <span><PixelSprite name="currency-bone" scale={0.46} /> <b>{wallet.bones}</b></span>
+            <span><PixelSprite name="currency-coin" scale={0.46} /> <b>{wallet.coins}</b></span>
           </div>
-          <span className="progress-number">{progress}%</span>
+        </header>
+
+        <div className="scene-day-switch" role="group" aria-label="Тип дня">
+          <button className={day.type === 'weekday' ? 'active' : ''} onClick={() => onChangeDayType('weekday')} type="button">Будни</button>
+          <button className={day.type === 'weekend' ? 'active' : ''} onClick={() => onChangeDayType('weekend')} type="button">Выходной</button>
         </div>
-        <div className="progress-track" aria-label={`Выполнено ${progress}%`}>
-          <span style={{ width: `${progress}%` }} />
-        </div>
-        <p className="next-task">{nextTask ? `Дальше: ${nextTask.title}. ${nextTask.hint}` : 'План закрыт. Можно просто побыть вместе.'}</p>
+
+        <DogScene name={name} progress={progress} tasks={day.tasks} onComplete={onCompleteTask} />
       </section>
 
-      <section className="section-block pixel-panel">
-        <div className="section-title-row">
-          <h2>Быстрые действия</h2>
-          <span>нажми после дела</span>
+      <section className="quest-strip" aria-label="Прогресс дня">
+        <div className="quest-progress-copy">
+          <span className="quest-progress-label">День {completed}/{day.tasks.length}</span>
+          <strong>{nextTask ? nextTask.title : 'Сегодня всё сделано'}</strong>
+          <small>{nextTask ? nextTask.hint : 'Можно просто побыть вместе и забрать заслуженный вечер.'}</small>
         </div>
-        <QuickActions tasks={day.tasks} onComplete={onCompleteTask} />
+        <div className="quest-progress-orb" style={{ '--day-progress': `${progress * 3.6}deg` } as React.CSSProperties}>
+          <span>{progress}%</span>
+        </div>
       </section>
 
-      <section className="section-block pixel-panel">
-        <div className="section-title-row">
-          <h2>План дня</h2>
-          <span>{day.type === 'weekday' ? 'спокойный ритм' : 'день приключений'}</span>
+      <section className="day-quest-sheet">
+        <div className="day-quest-heading">
+          <div>
+            <p className="game-kicker">План Моти</p>
+            <h2>{day.type === 'weekday' ? 'Спокойный будний ритм' : 'День для приключений'}</h2>
+          </div>
+          <span>{day.completionRewardClaimed ? 'Дневная награда получена' : 'Закрой день и получи монетки'}</span>
         </div>
-        <div className="task-list">
-          {day.tasks.map((task) => (
-            <button key={task.id} className={task.completedAt ? 'task-row task-done' : 'task-row'} onClick={() => !task.completedAt && onCompleteTask(task.id)} type="button">
-              <span className="task-check">{task.completedAt ? '✓' : '○'}</span>
-              <span className="task-copy">
+
+        <div className="day-quest-list">
+          {day.tasks.map((task, index) => (
+            <button
+              key={task.id}
+              className={task.completedAt ? 'day-quest-row day-quest-row-done' : 'day-quest-row'}
+              onClick={() => !task.completedAt && onCompleteTask(task.id)}
+              type="button"
+              disabled={Boolean(task.completedAt)}
+            >
+              <span className="day-quest-index">{task.completedAt ? '✓' : index + 1}</span>
+              <span className="day-quest-copy">
                 <strong>{task.title}</strong>
                 <small>{task.hint}</small>
               </span>
-              <span className="task-reward"><PixelSprite name="currency-bone" scale={0.35} /> +{task.rewardBones}</span>
+              <span className="day-quest-reward"><PixelSprite name="currency-bone" scale={0.3} />+{task.rewardBones}</span>
             </button>
           ))}
         </div>
