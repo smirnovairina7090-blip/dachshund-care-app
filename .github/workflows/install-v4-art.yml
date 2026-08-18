@@ -1,0 +1,212 @@
+name: Install lossless v4 art
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/v3-atlas.b64
+      - scripts/extract-v4-assets.py
+      - .github/workflows/install-v4-art.yml
+  issues:
+    types: [opened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install image tooling
+        run: python -m pip install --disable-pip-version-check pillow pillow-avif-plugin
+
+      - name: Extract lossless PNG assets
+        run: python scripts/extract-v4-assets.py
+
+      - name: Install direct image renderer
+        shell: bash
+        run: |
+          cat > src/components/PixelSprite.tsx <<'EOF'
+          type AssetDefinition = {
+            file: string
+            displayWidth: number
+            displayHeight: number
+          }
+
+          const asset = (file: string, displayWidth: number, displayHeight: number): AssetDefinition => ({
+            file,
+            displayWidth,
+            displayHeight,
+          })
+
+          const dogIdle = asset('dog-idle.png', 96, 86)
+          const dogHappy = asset('dog-happy.png', 96, 86)
+          const dogWaiting = asset('dog-waiting.png', 96, 86)
+          const dogCurious = asset('dog-curious.png', 96, 86)
+          const dogSleeping = asset('dog-sleeping.png', 96, 86)
+          const feed = asset('care-feed.png', 56, 56)
+          const water = asset('care-water.png', 56, 56)
+          const walk = asset('care-walk.png', 56, 56)
+          const play = asset('care-play.png', 56, 56)
+          const train = asset('care-training.png', 56, 56)
+          const groom = asset('care-groom.png', 56, 56)
+          const photo = asset('care-photo.png', 56, 56)
+          const bone = asset('ui-bone.png', 42, 42)
+          const coin = asset('ui-coin.png', 42, 42)
+          const heart = asset('ui-heart.png', 42, 42)
+          const home = asset('nav-home.png', 42, 42)
+          const training = asset('nav-training.png', 42, 42)
+          const adventures = asset('nav-adventures.png', 42, 42)
+          const history = asset('nav-history.png', 42, 42)
+          const more = asset('nav-more.png', 42, 42)
+          const windowAsset = asset('room-window.png', 160, 124)
+          const sofa = asset('room-sofa.png', 160, 124)
+          const rug = asset('room-rug.png', 160, 124)
+          const bed = asset('room-bed.png', 160, 124)
+          const tableLamp = asset('room-table-lamp.png', 160, 124)
+
+          const sprites = {
+            'dog-idle': dogIdle,
+            'dog-sitting': dogIdle,
+            'dog-standing': dogIdle,
+            'dog-happy': dogHappy,
+            'dog-curious': dogCurious,
+            'dog-waiting-walk': dogWaiting,
+            'dog-eating': dogIdle,
+            'dog-drinking': dogIdle,
+            'dog-playing': dogHappy,
+            'dog-bringing': dogHappy,
+            'dog-sleeping': dogSleeping,
+            'dog-brushed': dogHappy,
+            'dog-sad': dogWaiting,
+
+            'care-food': feed,
+            'care-water': water,
+            'care-leash': walk,
+            'care-play': play,
+            'care-brush': groom,
+            'care-bed': bed,
+            'care-sleep': bed,
+            'care-camera': photo,
+            'care-photo': photo,
+            'care-vet': groom,
+            'care-diary': history,
+            'care-trophy': coin,
+            'care-training': train,
+            'care-learn': train,
+            'care-grooming': groom,
+            'care-clean': groom,
+            'care-treat': feed,
+            'care-shower': water,
+            'care-nails': groom,
+            'care-pet': heart,
+
+            'nav-home': home,
+            'nav-training': training,
+            'nav-adventures': adventures,
+            'nav-history': history,
+            'nav-more': more,
+
+            'currency-bone': bone,
+            'currency-coin': coin,
+            'currency-heart': heart,
+            'effect-heart': heart,
+            'effect-speech': heart,
+            'effect-sparkle': coin,
+
+            'room-window': windowAsset,
+            'room-sofa': sofa,
+            'room-side-table': tableLamp,
+            'room-lamp': tableLamp,
+            'room-plant': tableLamp,
+            'room-plant-table': tableLamp,
+            'room-bed': bed,
+            'room-dog-bed': bed,
+            'room-rug': rug,
+          } satisfies Record<string, AssetDefinition>
+
+          export type PixelSpriteName = keyof typeof sprites
+
+          interface PixelSpriteProps {
+            name: PixelSpriteName
+            scale?: number
+            className?: string
+            label?: string
+          }
+
+          export function PixelSprite({ name, scale = 1, className, label }: PixelSpriteProps) {
+            const sprite = sprites[name]
+            const width = sprite.displayWidth * scale
+            const height = sprite.displayHeight * scale
+            const src = `${import.meta.env.BASE_URL}assets/art/v4/${sprite.file}`
+
+            return (
+              <span
+                className={className ? `cinematic-asset ${className}` : 'cinematic-asset'}
+                style={{
+                  display: 'inline-flex',
+                  width,
+                  height,
+                  flex: '0 0 auto',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 0,
+                }}
+                role={label ? 'img' : undefined}
+                aria-label={label}
+                aria-hidden={label ? undefined : true}
+              >
+                <img
+                  src={src}
+                  alt=""
+                  draggable={false}
+                  width={Math.round(width)}
+                  height={Math.round(height)}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </span>
+            )
+          }
+          EOF
+
+      - name: Verify assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s public/assets/art/v4/dog-idle.png
+          test -s public/assets/art/v4/care-feed.png
+          test -s public/assets/art/v4/ui-bone.png
+          test -s public/assets/art/v4/nav-home.png
+          test -s public/assets/art/v4/room-window.png
+          test "$(find public/assets/art/v4 -type f -name '*.png' | wc -l)" -eq 25
+
+      - name: Commit v4 renderer and PNGs
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/art/v4 src/components/PixelSprite.tsx
+          if git diff --cached --quiet; then
+            echo "v4 assets already installed."
+          else
+            git commit -m "design: install lossless v4 image assets"
+            git push
+          fi
