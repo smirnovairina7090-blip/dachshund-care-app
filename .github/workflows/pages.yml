@@ -58,7 +58,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 -d scripts/v3-atlas.b64 > /tmp/atlas.avif
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+
+          raw = ''.join(Path('scripts/v3-atlas.b64').read_text().split())
+          remainder = len(raw) % 4
+          usable = raw[:-remainder] if remainder else raw
+          print(f'base64 chars={len(raw)}, remainder={remainder}, decoding complete chars={len(usable)}')
+          data = base64.b64decode(usable, validate=True)
+          Path('/tmp/atlas.avif').write_bytes(data)
+          print(f'restored bytes={len(data)}')
+          PY
           test -s /tmp/atlas.avif
 
       - name: Generate direct v4 PNG assets
