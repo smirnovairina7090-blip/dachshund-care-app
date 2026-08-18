@@ -38,10 +38,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y libavif-bin
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
           mkdir -p public/assets/art/v3
-          avifdec /tmp/atlas.avif public/assets/art/v3/atlas.png
+          ffmpeg -y -i /tmp/atlas.avif -frames:v 1 public/assets/art/v3/atlas.png
           test -s public/assets/art/v3/atlas.png
           file public/assets/art/v3/atlas.png | grep -q 'PNG image data'
           echo "Generated browser-safe PNG atlas: $(wc -c < public/assets/art/v3/atlas.png) bytes"
