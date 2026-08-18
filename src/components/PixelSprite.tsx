@@ -97,7 +97,6 @@ interface PixelSpriteProps {
   label?: string
 }
 
-const CELL = 128
 const COLS = 6
 const ROWS = 3
 const assetUrl = `${import.meta.env.BASE_URL}assets/art/v5/ui.webp?v=20260818-v5-final`
