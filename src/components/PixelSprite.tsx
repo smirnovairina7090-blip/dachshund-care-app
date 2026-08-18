@@ -25,16 +25,7 @@ const sprite = (
   atlasWidth: number,
   atlasHeight: number,
   displayWidth: number,
-): AssetDefinition => ({
-  atlas,
-  x,
-  y,
-  width,
-  height,
-  atlasWidth,
-  atlasHeight,
-  displayWidth,
-})
+): AssetDefinition => ({ atlas, x, y, width, height, atlasWidth, atlasHeight, displayWidth })
 
 const dog = (column: number, row: number, displayWidth: number) =>
   sprite('dog.webp', column * 64, row * 56, 64, 56, 256, 168, displayWidth)
@@ -170,35 +161,47 @@ interface PixelSpriteProps {
 
 const assetRoot = `${import.meta.env.BASE_URL}assets/pixel/production/v2/`
 
-function positionPercent(offset: number, atlasSize: number, cellSize: number) {
-  if (atlasSize === cellSize) return '0%'
-  return `${(offset / (atlasSize - cellSize)) * 100}%`
-}
-
 export function PixelSprite({ name, scale = 1, className, label }: PixelSpriteProps) {
   const item = sprites[name]
   const width = item.displayWidth * scale
   const height = width * (item.height / item.width)
-  const backgroundWidth = (item.atlasWidth / item.width) * 100
-  const backgroundHeight = (item.atlasHeight / item.height) * 100
+  const atlasWidthPercent = (item.atlasWidth / item.width) * 100
+  const atlasHeightPercent = (item.atlasHeight / item.height) * 100
+  const leftPercent = -(item.x / item.width) * 100
+  const topPercent = -(item.y / item.height) * 100
 
   return (
     <span
       className={className ? `cinematic-asset ${className}` : 'cinematic-asset'}
       style={{
+        position: 'relative',
         display: 'inline-block',
+        overflow: 'hidden',
         width,
         height,
         flex: '0 0 auto',
-        backgroundColor: 'transparent',
-        backgroundImage: `url("${assetRoot}${item.atlas}?v=20260818-direct")`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: `${backgroundWidth}% ${backgroundHeight}%`,
-        backgroundPosition: `${positionPercent(item.x, item.atlasWidth, item.width)} ${positionPercent(item.y, item.atlasHeight, item.height)}`,
       }}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-    />
+    >
+      <img
+        src={`${assetRoot}${item.atlas}?v=20260818-direct-img`}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        style={{
+          position: 'absolute',
+          left: `${leftPercent}%`,
+          top: `${topPercent}%`,
+          width: `${atlasWidthPercent}%`,
+          height: `${atlasHeightPercent}%`,
+          maxWidth: 'none',
+          maxHeight: 'none',
+          display: 'block',
+          pointerEvents: 'none',
+        }}
+      />
+    </span>
   )
 }
