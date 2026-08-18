@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router'
 import App from './App'
 import './styles.css'
+import './game-v5.css'
 
 const rootElement = document.getElementById('root')
 
