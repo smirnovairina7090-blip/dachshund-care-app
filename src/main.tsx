@@ -4,6 +4,7 @@ import { HashRouter } from 'react-router'
 import App from './App'
 import './styles.css'
 import './styles-v5.css'
+import './styles-v6.css'
 
 const rootElement = document.getElementById('root')
 
