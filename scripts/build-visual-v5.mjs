@@ -1,11 +1,10 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
 
 const root = new URL('..', import.meta.url)
 
 async function decodeParts(relativeDir, outputName) {
   const dir = new URL(`${relativeDir}/`, root)
-  const files = (await readdir(dir)).filter((file) => file.endsWith('.b64')).sort()
+  const files = (await readdir(dir)).filter((file) => file.endsWith('.b64')).toSorted()
   if (!files.length) throw new Error(`No base64 parts in ${relativeDir}`)
 
   let encoded = ''
