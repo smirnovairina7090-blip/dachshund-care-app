@@ -1,63 +1,43 @@
 type AssetDefinition = {
-  x: number
-  y: number
-  width: number
-  height: number
+  file: string
   displayWidth: number
-  displayHeight: number
+  displayHeight?: number
 }
 
-const atlasWidth = 1000
-const atlasHeight = 496
-const atlasSrc = `${import.meta.env.BASE_URL}assets/art/v3/atlas.png?v=20260818-0250`
-
-const asset = (
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  displayWidth: number,
-): AssetDefinition => ({
-  x,
-  y,
-  width,
-  height,
+const asset = (file: string, displayWidth: number, displayHeight?: number): AssetDefinition => ({
+  file,
   displayWidth,
-  displayHeight: displayWidth * (height / width),
+  displayHeight,
 })
 
-// Character crops are taken from the real visible bounds of the generated art,
-// rather than from equal atlas cells. This prevents neighbouring dogs from leaking in.
-const dogIdle = asset(23, 21, 153, 154, 78)
-const dogHappy = asset(227, 5, 146, 170, 70)
-const dogCurious = asset(441, 6, 118, 168, 58)
-const dogPlaying = asset(609, 5, 182, 170, 86)
-const dogWaiting = asset(836, 5, 128, 170, 62)
+const dogIdle = asset('dog-idle.png', 78)
+const dogHappy = asset('dog-happy.png', 72)
+const dogCurious = asset('dog-curious.png', 62)
+const dogPlaying = asset('dog-playing.png', 88)
+const dogWaiting = asset('dog-waiting.png', 66)
 
-const feed = asset(5, 185, 86, 86, 56)
-const water = asset(101, 186, 86, 83, 56)
-const walk = asset(201, 204, 82, 64, 58)
-const play = asset(293, 186, 86, 83, 56)
-const train = asset(389, 188, 86, 80, 56)
-const groom = asset(485, 188, 86, 80, 56)
-const photo = asset(581, 190, 86, 75, 56)
+const feed = asset('care-feed.png', 56)
+const water = asset('care-water.png', 56)
+const walk = asset('care-walk.png', 58)
+const play = asset('care-play.png', 56)
+const train = asset('care-train.png', 56)
+const groom = asset('care-groom.png', 56)
+const photo = asset('care-photo.png', 56)
 
-// UI/nav icons keep their complete 80x80 generated cells so their soft 3D frames are intact.
-const bone = asset(0, 276, 80, 80, 42)
-const coin = asset(80, 276, 80, 80, 42)
-const heart = asset(160, 276, 80, 80, 42)
-const home = asset(240, 276, 80, 80, 42)
-const training = asset(320, 276, 80, 80, 42)
-const adventures = asset(400, 276, 80, 80, 42)
-const history = asset(480, 276, 80, 80, 42)
-const more = asset(560, 276, 80, 80, 42)
+const bone = asset('ui-bone.png', 42)
+const coin = asset('ui-coin.png', 42)
+const heart = asset('ui-heart.png', 42)
+const home = asset('nav-home.png', 42)
+const training = asset('nav-training.png', 42)
+const adventures = asset('nav-adventures.png', 42)
+const history = asset('nav-history.png', 42)
+const more = asset('nav-more.png', 42)
 
-// Room crops deliberately start below the generated sheet headings.
-const windowAsset = asset(30, 386, 119, 110, 118)
-const sofa = asset(188, 386, 163, 110, 150)
-const rug = asset(365, 387, 170, 77, 150)
-const bed = asset(545, 369, 170, 113, 150)
-const tableLamp = asset(761, 361, 97, 130, 92)
+const windowAsset = asset('room-window.png', 118)
+const sofa = asset('room-sofa.png', 150)
+const rug = asset('room-rug.png', 150)
+const bed = asset('room-bed.png', 150)
+const tableLamp = asset('room-table-lamp.png', 92)
 
 const sprites = {
   'dog-idle': dogIdle,
@@ -131,25 +111,24 @@ interface PixelSpriteProps {
 export function PixelSprite({ name, scale = 1, className, label }: PixelSpriteProps) {
   const sprite = sprites[name]
   const width = sprite.displayWidth * scale
-  const height = sprite.displayHeight * scale
-  const renderScale = width / sprite.width
+  const src = `${import.meta.env.BASE_URL}assets/art/v4/${sprite.file}?v=20260818-0823`
 
   return (
-    <span
+    <img
       className={className ? `cinematic-asset ${className}` : 'cinematic-asset'}
-      style={{
-        width,
-        height,
-        display: 'inline-block',
-        flex: '0 0 auto',
-        backgroundImage: `url(${atlasSrc})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: `${atlasWidth * renderScale}px ${atlasHeight * renderScale}px`,
-        backgroundPosition: `${-sprite.x * renderScale}px ${-sprite.y * renderScale}px`,
-      }}
-      role={label ? 'img' : undefined}
-      aria-label={label}
+      src={src}
+      width={width}
+      height={sprite.displayHeight ? sprite.displayHeight * scale : undefined}
+      alt={label ?? ''}
       aria-hidden={label ? undefined : true}
+      draggable={false}
+      style={{
+        display: 'block',
+        width,
+        height: sprite.displayHeight ? sprite.displayHeight * scale : 'auto',
+        objectFit: 'contain',
+        flex: '0 0 auto',
+      }}
     />
   )
 }
