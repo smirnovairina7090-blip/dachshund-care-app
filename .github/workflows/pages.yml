@@ -39,17 +39,17 @@ jobs:
       - name: Build production app
         run: npm run build
 
-      - name: Verify shipped binary art
+      - name: Verify v5 generated art in production bundle
         shell: bash
         run: |
           set -euo pipefail
-          for asset in dog.webp care.webp navigation.webp currency-effects.webp room.webp; do
-            test -s "dist/assets/pixel/production/v2/${asset}"
-            file "dist/assets/pixel/production/v2/${asset}" | grep -qi 'Web/P image\|WebP'
-          done
-          grep -R --binary-files=text -q 'assets/pixel/production/v2/' dist/assets
+          test -s dist/assets/art/v5/scene.webp
+          test -s dist/assets/art/v5/ui.webp
+          file dist/assets/art/v5/scene.webp | grep -qi 'Web/P image\|WebP'
+          file dist/assets/art/v5/ui.webp | grep -qi 'Web/P image\|WebP'
+          grep -R --binary-files=text -q 'assets/art/v5/' dist/assets
           grep -R --binary-files=text -q '/dachshund-care-app/' dist
-          echo "Production bundle contains shipped WebP art and the GitHub Pages base path."
+          echo "Production bundle contains the v5 scene, UI art and GitHub Pages base path."
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -70,24 +70,21 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Smoke-test published app and art
+      - name: Smoke-test published v5 app and art
         shell: bash
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
-          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}?v=direct-art-img" -o /tmp/index.html
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}?v=v5-final" -o /tmp/index.html
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v5/scene.webp?v=v5-final" -o /tmp/scene.webp
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v5/ui.webp?v=v5-final" -o /tmp/ui.webp
           test -s /tmp/index.html
-
-          for asset in dog.webp care.webp navigation.webp currency-effects.webp room.webp; do
-            curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors \
-              "${PAGE_URL}assets/pixel/production/v2/${asset}?v=direct-art-img" \
-              -o "/tmp/${asset}"
-            test -s "/tmp/${asset}"
-            file "/tmp/${asset}" | grep -qi 'Web/P image\|WebP'
-          done
-
-          echo "Published app and all five binary art atlases are reachable from GitHub Pages."
+          test -s /tmp/scene.webp
+          test -s /tmp/ui.webp
+          file /tmp/scene.webp | grep -qi 'Web/P image\|WebP'
+          file /tmp/ui.webp | grep -qi 'Web/P image\|WebP'
+          echo "Published v5 app, HD room scene and 3D UI atlas are reachable from GitHub Pages."
 
   mark-success:
     runs-on: ubuntu-latest
@@ -103,7 +100,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p docs
-          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\nv2 direct WebP smoke test: passed\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
+          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\nv5 generated 3D art smoke test: passed\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/LAST_PAGES_DEPLOY.txt
