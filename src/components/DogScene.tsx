@@ -37,6 +37,19 @@ function getMood(progress: number): string {
   return 'явно ждёт первого приключения'
 }
 
+function moveCamera(event: PointerEvent<HTMLElement>) {
+  const rect = event.currentTarget.getBoundingClientRect()
+  const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
+  const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
+  event.currentTarget.style.setProperty('--scene-look-x', x.toFixed(3))
+  event.currentTarget.style.setProperty('--scene-look-y', y.toFixed(3))
+}
+
+function resetCamera(event: PointerEvent<HTMLElement>) {
+  event.currentTarget.style.setProperty('--scene-look-x', '0')
+  event.currentTarget.style.setProperty('--scene-look-y', '0')
+}
+
 export function DogScene({ name, progress, tasks, onComplete }: DogSceneProps) {
   const [reaction, setReaction] = useState<Reaction | null>(null)
   const reactionTimer = useRef<number | undefined>(undefined)
@@ -56,19 +69,6 @@ export function DogScene({ name, progress, tasks, onComplete }: DogSceneProps) {
 
   function petMotya() {
     showReaction({ key: 'pet', text: 'Да. Вот здесь за ушком. Именно так.' })
-  }
-
-  function moveCamera(event: PointerEvent<HTMLElement>) {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
-    event.currentTarget.style.setProperty('--scene-look-x', x.toFixed(3))
-    event.currentTarget.style.setProperty('--scene-look-y', y.toFixed(3))
-  }
-
-  function resetCamera(event: PointerEvent<HTMLElement>) {
-    event.currentTarget.style.setProperty('--scene-look-x', '0')
-    event.currentTarget.style.setProperty('--scene-look-y', '0')
   }
 
   const reactionClass = reaction ? ` dog-scene-reaction dog-scene-reaction-${reaction.key}` : ''
