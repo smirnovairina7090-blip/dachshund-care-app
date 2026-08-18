@@ -11,6 +11,8 @@ SOURCE_B64 = ROOT / "scripts" / "v3-atlas.b64"
 SOURCE_AVIF = ROOT / ".tmp-v3-atlas.avif"
 OUTPUT = ROOT / "public" / "assets" / "art" / "v4"
 
+# Keep the generated art as real lossless files in the repository. The UI renders
+# these PNGs directly instead of rebuilding visual assets from CSS primitives.
 EXPECTED_SIZE = (1000, 496)
 
 ASSETS: dict[str, tuple[int, int, int, int]] = {
