@@ -3,15 +3,10 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - docs/LAST_PAGES_DEPLOY.txt
-      - docs/LAST_PAGES_START.txt
-  issues:
-    types: [opened]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -23,24 +18,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout current main
+      - name: Checkout
         uses: actions/checkout@v6
-        with:
-          ref: main
-
-      - name: Record workflow start
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p docs
-          printf 'Pages workflow started\nSource event SHA: %s\nWorkflow run: %s\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_START.txt
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/LAST_PAGES_START.txt
-          if ! git diff --cached --quiet; then
-            git commit -m "ci: record Pages workflow start"
-            git push
-          fi
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -48,56 +27,22 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Install app dependencies
+      - name: Install dependencies
         run: npm install
-
-      - name: Install image build dependency
-        run: npm install --no-save sharp
-
-      - name: Restore source art
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import base64
-
-          raw = ''.join(Path('scripts/v3-atlas.b64').read_text().split())
-          remainder = len(raw) % 4
-          usable = raw[:-remainder] if remainder else raw
-          print(f'base64 chars={len(raw)}, remainder={remainder}, decoding complete chars={len(usable)}')
-          data = base64.b64decode(usable, validate=True)
-          Path('/tmp/atlas.avif').write_bytes(data)
-          print(f'restored bytes={len(data)}')
-          PY
-          test -s /tmp/atlas.avif
-
-      - name: Generate direct v4 PNG assets
-        run: node scripts/extract-v4-art.mjs
-
-      - name: Verify generated v4 assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(find public/assets/art/v4 -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 25
-          test -s public/assets/art/v4/dog-idle.png
-          test -s public/assets/art/v4/care-feed.png
-          file public/assets/art/v4/dog-idle.png | grep -q 'PNG image data'
-          file public/assets/art/v4/care-feed.png | grep -q 'PNG image data'
-          echo "Generated 25 direct PNG assets."
 
       - name: Build production app
         run: npm run build
 
-      - name: Verify production bundle
+      - name: Verify shipped binary art
         shell: bash
         run: |
           set -euo pipefail
-          test -s dist/assets/art/v4/dog-idle.png
-          test -s dist/assets/art/v4/care-feed.png
-          file dist/assets/art/v4/dog-idle.png | grep -q 'PNG image data'
-          grep -R --binary-files=text -q 'assets/art/v4/' dist/assets
-          echo "Production bundle contains and references v4 PNG art."
+          for asset in dog.webp care.webp navigation.webp currency-effects.webp room.webp; do
+            test -s "dist/assets/pixel/production/v2/${asset}"
+            file "dist/assets/pixel/production/v2/${asset}" | grep -qi 'Web/P image\|WebP'
+          done
+          grep -R --binary-files=text -q 'assets/pixel/production/v2/' dist/assets
+          echo "Production bundle contains and references the shipped WebP art pack."
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -118,43 +63,21 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Smoke-test published app and direct PNG art
+      - name: Smoke-test published app and art
         shell: bash
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
-          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}" -o /tmp/index.html
-          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v4/dog-idle.png?v=20260818-0823" -o /tmp/dog.png
-          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v4/care-feed.png?v=20260818-0823" -o /tmp/feed.png
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}?v=direct-art" -o /tmp/index.html
           test -s /tmp/index.html
-          test -s /tmp/dog.png
-          test -s /tmp/feed.png
-          file /tmp/dog.png | grep -q 'PNG image data'
-          file /tmp/feed.png | grep -q 'PNG image data'
-          echo "Published app, dog PNG and care PNG are reachable."
 
-  mark-success:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Checkout current main
-        uses: actions/checkout@v6
-        with:
-          ref: main
+          for asset in dog.webp care.webp navigation.webp currency-effects.webp room.webp; do
+            curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors \
+              "${PAGE_URL}assets/pixel/production/v2/${asset}?v=direct-art" \
+              -o "/tmp/${asset}"
+            test -s "/tmp/${asset}"
+            file "/tmp/${asset}" | grep -qi 'Web/P image\|WebP'
+          done
 
-      - name: Record successful Pages deploy
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p docs
-          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\nv4 direct PNG smoke test: passed\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/LAST_PAGES_DEPLOY.txt
-          if git diff --cached --quiet; then
-            echo "Deploy marker is already current."
-          else
-            git commit -m "ci: record successful Pages deploy"
-            git push
-          fi
+          echo "Published app and all five binary art atlases are reachable from GitHub Pages."
