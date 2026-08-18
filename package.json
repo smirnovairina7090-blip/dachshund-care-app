@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "assets:v5": "node scripts/build-visual-v5.mjs",
+    "dev": "node scripts/build-visual-v5.mjs && vite",
+    "build": "node scripts/build-visual-v5.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
     "lint": "oxlint --max-warnings 0",
