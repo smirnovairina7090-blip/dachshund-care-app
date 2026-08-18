@@ -27,6 +27,18 @@ jobs:
         with:
           ref: main
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm install
+
+      - name: Install image build dependency
+        run: npm install --no-save sharp
+
       - name: Restore source art
         shell: bash
         run: |
@@ -34,40 +46,32 @@ jobs:
           base64 -d scripts/v3-atlas.b64 > /tmp/atlas.avif
           test -s /tmp/atlas.avif
 
-      - name: Convert art to universal PNG
+      - name: Generate direct v4 PNG assets
+        run: node scripts/extract-v4-art.mjs
+
+      - name: Verify generated v4 assets
         shell: bash
         run: |
           set -euo pipefail
-          if ! command -v ffmpeg >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install -y ffmpeg
-          fi
-          mkdir -p public/assets/art/v3
-          ffmpeg -y -i /tmp/atlas.avif -frames:v 1 public/assets/art/v3/atlas.png
-          test -s public/assets/art/v3/atlas.png
-          file public/assets/art/v3/atlas.png | grep -q 'PNG image data'
-          echo "Generated browser-safe PNG atlas: $(wc -c < public/assets/art/v3/atlas.png) bytes"
-
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
+          test "$(find public/assets/art/v4 -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 25
+          test -s public/assets/art/v4/dog-idle.png
+          test -s public/assets/art/v4/care-feed.png
+          file public/assets/art/v4/dog-idle.png | grep -q 'PNG image data'
+          file public/assets/art/v4/care-feed.png | grep -q 'PNG image data'
+          echo "Generated 25 direct PNG assets."
 
       - name: Build production app
         run: npm run build
 
-      - name: Verify production art
+      - name: Verify production bundle
         shell: bash
         run: |
           set -euo pipefail
-          test -s dist/assets/art/v3/atlas.png
-          file dist/assets/art/v3/atlas.png | grep -q 'PNG image data'
-          grep -R --binary-files=text -q 'atlas.png?v=20260818-0250' dist/assets
-          echo "Production bundle references and contains the PNG atlas."
+          test -s dist/assets/art/v4/dog-idle.png
+          test -s dist/assets/art/v4/care-feed.png
+          file dist/assets/art/v4/dog-idle.png | grep -q 'PNG image data'
+          grep -R --binary-files=text -q 'assets/art/v4/' dist/assets
+          echo "Production bundle contains and references v4 PNG art."
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -88,18 +92,21 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Smoke-test published app and PNG art
+      - name: Smoke-test published app and direct PNG art
         shell: bash
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
           curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}" -o /tmp/index.html
-          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v3/atlas.png?v=20260818-0250" -o /tmp/atlas.png
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v4/dog-idle.png?v=20260818-0823" -o /tmp/dog.png
+          curl --fail --location --retry 8 --retry-delay 4 --retry-all-errors "${PAGE_URL}assets/art/v4/care-feed.png?v=20260818-0823" -o /tmp/feed.png
           test -s /tmp/index.html
-          test -s /tmp/atlas.png
-          file /tmp/atlas.png | grep -q 'PNG image data'
-          echo "Published app and PNG atlas are reachable."
+          test -s /tmp/dog.png
+          test -s /tmp/feed.png
+          file /tmp/dog.png | grep -q 'PNG image data'
+          file /tmp/feed.png | grep -q 'PNG image data'
+          echo "Published app, dog PNG and care PNG are reachable."
 
   mark-success:
     runs-on: ubuntu-latest
@@ -115,7 +122,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p docs
-          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\nPNG atlas smoke test: passed\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
+          printf 'Pages deploy succeeded\nSource commit: %s\nWorkflow run: %s\nv4 direct PNG smoke test: passed\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_DEPLOY.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/LAST_PAGES_DEPLOY.txt
