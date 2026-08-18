@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - docs/LAST_PAGES_DEPLOY.txt
+      - docs/LAST_PAGES_START.txt
   issues:
     types: [opened]
   workflow_dispatch:
@@ -26,6 +27,20 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
+
+      - name: Record workflow start
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs
+          printf 'Pages workflow started\nSource event SHA: %s\nWorkflow run: %s\n' "${GITHUB_SHA}" "${GITHUB_RUN_ID}" > docs/LAST_PAGES_START.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/LAST_PAGES_START.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "ci: record Pages workflow start"
+            git push
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v7
